@@ -65,6 +65,9 @@ async function buildOrder(body) {
   const number = clean(body.number, 10);
   if (!number) return { ok: false, status: 400, error: 'Informe o número da residência.' };
   const complement = clean(body.complement, 60);
+  const street = clean(body.street, 70);
+  const district = clean(body.district, 50);
+  if (!street || !district) return { ok: false, status: 400, error: 'Informe rua e bairro.' };
 
   let place;
   try { place = await lookupCep(cep); }
@@ -78,16 +81,20 @@ async function buildOrder(body) {
   return {
     ok: true,
     order: {
-      productId: id, qty, name, cep, number, complement,
+      productId: id, qty, name, cep, number, complement, street, district, city: place.city,
       unitCents: unit, totalCents: unit * qty,
+      // Descrição curta (usada como reserva) e completa, com os dados de entrega para a loja ver no painel da Magnus Pay.
       description: 'Ultragaz Entregas Flash - ' + qty + 'x ' + product.label + ' (' + place.city + ')',
+      deliveryDescription: ('Ultragaz Flash | ' + qty + 'x gás P13 troca | ' + street + ', ' + number + (complement ? ' ' + complement : '') +
+        ' - ' + district + ' | ' + place.city + '/SP | CEP ' + cep.slice(0, 5) + '-' + cep.slice(5)).slice(0, 180),
     },
   };
 }
 
-function safeCharge(data, order) {
+function safeCharge(data, order, deliveryDataSent) {
   const out = {
     ok: true,
+    deliveryDataSent: Boolean(deliveryDataSent),
     transactionId: String(data.transactionId),
     total: order.totalCents / 100,
     unit: order.unitCents / 100,
@@ -129,25 +136,36 @@ module.exports = async (req, res) => {
 
   // Anti-duplicidade (melhor esforço, sem banco): mesmo pedido em até 10 min reutiliza a cobrança.
   const fp = crypto.createHash('sha256')
-    .update([order.productId, order.qty, order.cep, order.number, order.complement, order.name, order.totalCents].join('|'))
+    .update([order.productId, order.qty, order.cep, order.street, order.district, order.number, order.complement, order.name, order.totalCents].join('|'))
     .digest('hex');
   const now = Date.now();
   for (const [k, v] of recent) if (now - v.at > REUSE_MS) recent.delete(k);
-  const hit = recent.get(fp);
+  const retry = body.retry === true; // cliente pediu um novo Pix depois de expirar/falhar
+  const hit = retry ? null : recent.get(fp);
   if (hit) return sendJson(res, 200, hit.payload);
 
-  let data;
-  try {
-    const r = await fetch(MAGNUS_URL, {
+  async function createCharge(description) {
+    return fetch(MAGNUS_URL, {
       method: 'POST',
       headers: { 'X-API-Key': apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         amount: order.totalCents / 100, // documentado: valor em reais
-        description: order.description,
+        description,
         payerName: order.name,
       }),
       signal: AbortSignal.timeout(9000),
     });
+  }
+
+  let data;
+  let deliveryDataSent = true;
+  try {
+    let r = await createCharge(order.deliveryDescription);
+    if (r.status === 400 || r.status === 422) { // descrição longa recusada: tenta a versão curta
+      console.error('magnus create: HTTP', r.status, '(descrição completa recusada, usando a curta)');
+      deliveryDataSent = false;
+      r = await createCharge(order.description);
+    }
     if (!r.ok) {
       console.error('magnus create: HTTP', r.status); // nunca registrar corpo, headers ou chave
       return sendJson(res, 502, { ok: false, error: 'Não foi possível gerar o Pix agora. Tente novamente ou chame pelo WhatsApp.' });
@@ -164,7 +182,7 @@ module.exports = async (req, res) => {
     return sendJson(res, 502, { ok: false, error: 'Não foi possível gerar o Pix agora. Tente novamente ou chame pelo WhatsApp.' });
   }
 
-  const payload = safeCharge(data, order);
+  const payload = safeCharge(data, order, deliveryDataSent);
   recent.set(fp, { at: now, payload });
   return sendJson(res, 201, payload);
 };
