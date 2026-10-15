@@ -876,15 +876,68 @@ body { padding-bottom: 4.5rem; }
   .product-featured .product-body { flex: 1; padding: 1.75rem 1.75rem 1.75rem .5rem; }
 }
 
-/* ---------- Pagamento por Pix (Magnus Pay) ---------- */
-.pix-panel { display: grid; gap: .6rem; margin-bottom: 1rem; padding: 1rem; background: var(--blue-soft); border: 1px solid var(--line); border-radius: var(--radius); text-align: center; }
-.pix-title { margin: 0; font-size: 1.1rem; color: var(--blue-dark); }
-.pix-total { margin-left: .35rem; font-weight: 900; }
-.pix-status { margin: 0; font-size: .95rem; font-weight: 600; color: var(--muted); }
-.pix-status.is-ok { color: var(--whats); }
-.pix-status.is-error { color: #8c1d18; }
-.pix-qr { justify-self: center; width: 220px; max-width: 100%; height: auto; background: var(--white); border: 1px solid var(--line); border-radius: 10px; }
-.pix-label { font-size: .85rem; font-weight: 700; color: var(--muted); text-align: left; }
-.pix-code { width: 100%; padding: .65rem .75rem; font: inherit; font-size: .85rem; color: var(--text); background: var(--white); border: 1px solid var(--line); border-radius: 10px; text-overflow: ellipsis; }
-.pix-copy, .pix-wa { width: 100%; max-width: none; }
+/* ==========================================================
+   REFINAMENTO FINAL — checkout Pix e acabamento (mesma identidade visual)
+   ========================================================== */
+body { font-synthesis: none; text-rendering: optimizeLegibility; }
+h1, h2, h3 { text-wrap: balance; }
+.btn { min-height: 52px; }
+.btn:disabled, .btn[disabled] { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-header { min-height: 44px; }
+.link-btn, .qty-btn, .carousel-dot { touch-action: manipulation; }
+.link-btn { min-height: 44px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+.order-form :focus-visible { outline-color: var(--blue); }
 
+/* Cartões e formulário: bordas discretas e sombras suaves */
+.order-form { border: 1px solid rgba(255,255,255,.12); box-shadow: 0 18px 40px rgba(2,12,40,.32); }
+.form-step { padding-bottom: 1.25rem; border-bottom: 1px solid #eef1f7; }
+.form-step:last-of-type { border-bottom: 0; }
+.field input { border-color: #b6c1d9; }
+.field input::placeholder { color: #6b7790; }
+.summary { background: linear-gradient(180deg, #f8faff, #f3f6fc); box-shadow: 0 1px 2px rgba(7,42,105,.06); }
+.summary-list dd { font-variant-numeric: tabular-nums; }
+.trust { padding: .85rem 1rem; background: #f7faf8; border: 1px solid #dcebe1; border-radius: var(--radius); font-weight: 600; }
+.support-line { margin-top: .9rem; text-align: center; font-size: .9rem; color: var(--muted); }
+.support-line a, .support-link { font-weight: 700; color: var(--blue); text-underline-offset: 3px; }
+.order-bar { box-shadow: 0 -8px 20px rgba(7,42,105,.08); }
+@media (min-width: 640px) { .order-bar { box-shadow: none; } }
+.is-paying .order-bar, .is-paying .support-line { display: none; }
+
+/* Painel de pagamento Pix */
+.pay { display: grid; gap: .85rem; margin-bottom: 1.25rem; padding: 1.25rem 1.1rem; text-align: center; background: linear-gradient(180deg, #f2f7ff, #eaf1ff); border: 1px solid #c9d7f2; border-radius: 14px; box-shadow: 0 6px 18px rgba(7,42,105,.08); animation: fade-in .3s ease-out; }
+.pay[hidden] { display: none; }
+.pay-head { display: grid; gap: .15rem; }
+.pay-title { font-size: 1.2rem; font-weight: 800; color: var(--blue-dark); }
+.pay-title:focus { outline: none; }
+.pay-title:focus-visible { outline: 3px solid var(--yellow); outline-offset: 4px; border-radius: 6px; }
+.pay-amount { font-size: 2rem; font-weight: 900; line-height: 1.1; color: var(--blue-dark); font-variant-numeric: tabular-nums; }
+.pay-status { padding: .65rem .85rem; font-size: .95rem; font-weight: 700; line-height: 1.35; color: var(--blue-dark); background: var(--white); border: 1px solid #c9d7f2; border-radius: 10px; }
+.pay-status.is-ok { color: #0b5f2f; background: #e6f6ec; border-color: #a9dcbb; font-size: 1.05rem; }
+.pay-status.is-error { color: #8c1d18; background: #fdecea; border-color: #f2c1bd; }
+.pay-timer { font-size: .95rem; color: var(--muted); }
+.pay-timer strong { font-variant-numeric: tabular-nums; color: var(--blue-dark); }
+.pay-body { display: grid; gap: .7rem; }
+.pix-qr { justify-self: center; width: 220px; max-width: 100%; height: auto; padding: .5rem; background: var(--white); border: 1px solid var(--line); border-radius: 12px; image-rendering: pixelated; }
+.pay-steps { display: grid; gap: .35rem; padding-left: 1.25rem; text-align: left; font-size: .95rem; color: var(--text); list-style: decimal; }
+.pix-label { font-size: .85rem; font-weight: 700; text-align: left; color: var(--muted); }
+.pix-code { width: 100%; min-height: 48px; padding: 0 .75rem; font: inherit; font-size: .9rem; color: var(--text); background: var(--white); border: 1.5px solid #b6c1d9; border-radius: 10px; text-overflow: ellipsis; }
+.pix-copy, .pay-actions .btn, .pay-done .btn { width: 100%; max-width: none; }
+.pay-feedback { min-height: 1.25rem; font-size: .9rem; font-weight: 700; }
+.pay-feedback.is-ok { color: var(--whats); }
+.pay-feedback.is-error { color: #8c1d18; }
+.pay-actions { display: grid; gap: .6rem; justify-items: center; }
+.pay-warn { font-size: .85rem; color: var(--muted); }
+.pay-done { display: grid; gap: .9rem; }
+.pay-done-list > div { display: flex; justify-content: space-between; gap: 1rem; padding-block: .5rem; border-top: 1px solid #c9d7f2; text-align: left; }
+.pay-done-list dt { flex: none; color: var(--muted); }
+.pay-done-list dd { margin: 0; font-weight: 700; text-align: right; white-space: pre-line; overflow-wrap: anywhere; }
+.pay-next { padding: .8rem .9rem; font-size: .95rem; line-height: 1.45; text-align: left; background: var(--white); border: 1px solid #c9d7f2; border-radius: 10px; }
+
+/* Textos novos */
+.loyalty-note { max-width: 46ch; margin: .9rem auto 0; font-size: .9rem; color: var(--muted); }
+.products-note { max-width: 52ch; margin: .75rem 0 0; padding: .6rem .85rem; font-size: .92rem; font-weight: 600; color: var(--amber-text); background: var(--amber-bg); border-left: 4px solid var(--amber-line); border-radius: 8px; text-align: left; }
+.hero-link { text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) { .pay { animation: none; } }
+@media (min-width: 640px) { .pay { padding: 1.5rem; } .pay-actions .btn, .pix-copy { max-width: 420px; } }
