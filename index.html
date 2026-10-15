@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ultragaz Entregas Flash | Gás em São Vicente, Santos e Praia Grande</title>
-  <meta name="description" content="Peça seu gás pelo WhatsApp. R$ 110 com entrega em São Vicente e Santos. Praia Grande: R$ 120 com entrega. Trabalhamos somente com troca de botijão.">
+  <meta name="description" content="Compre seu gás pelo site e pague com Pix. R$ 110 com entrega em São Vicente e Santos. Praia Grande: R$ 120 com entrega. Trabalhamos somente com troca de botijão.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:title" content="Ultragaz Entregas Flash | Gás em São Vicente, Santos e Praia Grande">
-  <meta property="og:description" content="Gás por R$ 110 com entrega inclusa em São Vicente e Santos. Praia Grande: R$ 120 com entrega. Peça pelo WhatsApp.">
+  <meta property="og:description" content="Gás por R$ 110 com entrega inclusa em São Vicente e Santos. Praia Grande: R$ 120 com entrega. Pague com Pix.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
         <span class="brand-name">ULTRAGAZ</span>
         <span class="brand-sub">ENTREGAS FLASH</span>
       </a>
-      <a class="btn btn-header" href="https://wa.me/5513976033642" target="_blank" rel="noopener" aria-label="Chamar a Ultragaz Entregas Flash no WhatsApp">Chamar no WhatsApp</a>
+      <a class="btn btn-header" href="#pedido">Comprar gás</a>
     </div>
   </header>
 
@@ -33,9 +33,9 @@
         <h1 id="hero-title">Gás na sua porta por <span class="hero-price">R$&nbsp;110</span></h1>
         <p class="hero-sub">Entrega inclusa em São Vicente e Santos.</p>
         <p class="hero-extra">Praia Grande: <strong>R$&nbsp;120 com entrega.</strong></p>
-        <a class="btn btn-primary" href="https://wa.me/5513976033642" target="_blank" rel="noopener">PEDIR PELO WHATSAPP</a>
-        <p class="hero-note">Atendimento rápido pelo WhatsApp</p>
-        <a class="hero-link" href="#pedido">Ou monte seu pedido aqui</a>
+        <a class="btn btn-primary" href="#pedido">COMPRAR GÁS</a>
+        <p class="hero-note">Pague com Pix direto no site</p>
+        <a class="hero-link" href="https://wa.me/5513976033642" target="_blank" rel="noopener">Dúvidas? Fale com o suporte no WhatsApp</a>
         </div>
         <figure class="hero-media">
           <picture>
@@ -81,8 +81,8 @@
           <h2 id="order-title">Faça seu pedido</h2>
           <h3 class="order-subtitle">Pedido simples e transparente</h3>
           <p>Atendimento local com entrega em São Vicente, Santos e Praia Grande.</p>
-          <p>Você informa seus dados, confere o pedido e finaliza diretamente pelo WhatsApp.</p>
-          <p class="order-privacy"><span aria-hidden="true">🔒</span> Seus dados são utilizados apenas para facilitar o atendimento do seu pedido.</p>
+          <p>Você informa seus dados, confere o valor total, gera o Pix e acompanha a confirmação do pagamento aqui mesmo.</p>
+          <p class="order-privacy"><span aria-hidden="true">🔒</span> Seus dados de entrega seguem junto com o pagamento Pix e são usados apenas para entregar o seu pedido.</p>
           <aside class="notice" role="note">
             <svg class="notice-icon" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M7 7h10l-2.5-2.5M17 17H7l2.5 2.5M17 7l-2.5 2.5M7 17l2.5-2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <p class="notice-text"><strong>Importante:</strong> trabalhamos com troca de botijão vazio por um cheio. Não realizamos a venda do botijão/recipiente.</p>
@@ -152,38 +152,71 @@
               <div><dt>Nome</dt><dd id="s-name">—</dd></div>
               <div><dt>Endereço</dt><dd id="s-address">—</dd></div>
               <div><dt>Pedido</dt><dd id="s-order">1 gás</dd></div>
+              <div><dt>Valor por gás</dt><dd id="s-unit">—</dd></div>
+              <div><dt>Entrega</dt><dd>Incluída</dd></div>
               <div class="summary-total"><dt>Total</dt><dd id="s-total" aria-live="polite">Informe o CEP</dd></div>
             </dl>
             <p class="summary-note" id="s-note" hidden></p>
           </div>
 
           <ul class="trust">
-            <li><span aria-hidden="true">✓</span> Endereço confirmado</li>
-            <li><span aria-hidden="true">✓</span> Pedido conferido</li>
-            <li><span aria-hidden="true">✓</span> Valor informado antes do envio</li>
-            <li><span aria-hidden="true">✓</span> Atendimento pelo WhatsApp</li>
+            <li><span aria-hidden="true">✓</span> Região de entrega confirmada pelo CEP</li>
+            <li><span aria-hidden="true">✓</span> Valor total antes de pagar</li>
+            <li><span aria-hidden="true">✓</span> Pagamento por Pix</li>
+            <li><span aria-hidden="true">✓</span> Troca do botijão vazio na entrega</li>
           </ul>
 
           <p class="form-error" id="form-error" role="alert" hidden></p>
 
-          <div class="pix-panel" id="pix-panel" hidden>
-            <h3 class="pix-title">Pague com Pix <span class="pix-total" id="pix-total"></span></h3>
-            <p class="pix-status" id="pix-status" role="status" aria-live="polite"></p>
-            <img class="pix-qr" id="pix-qr" alt="QR Code Pix para pagar o pedido" width="220" height="220" hidden>
-            <label class="pix-label" for="pix-code">Pix copia e cola</label>
-            <input class="pix-code" id="pix-code" type="text" readonly>
-            <button type="button" class="btn btn-secondary pix-copy" id="pix-copy">COPIAR CÓDIGO PIX</button>
-            <a class="link-btn" id="pix-link" href="#" target="_blank" rel="noopener" hidden>Abrir link de pagamento</a>
-            <a class="btn btn-primary pix-wa" id="pix-wa" href="#" target="_blank" rel="noopener" hidden>ENVIAR PEDIDO PELO WHATSAPP</a>
-          </div>
+          <section class="pay" id="pix-panel" aria-labelledby="pay-title" hidden>
+            <div class="pay-head">
+              <h3 class="pay-title" id="pay-title" tabindex="-1">Pague com Pix</h3>
+              <p class="pay-amount" id="pix-total"></p>
+            </div>
+            <p class="pay-status" id="pix-status" role="status" aria-live="polite"></p>
+            <p class="pay-timer" id="pix-timer" hidden>O Pix expira em <strong id="pix-countdown">15:00</strong></p>
+
+            <div class="pay-body" id="pay-body">
+              <img class="pix-qr" id="pix-qr" alt="QR Code Pix para pagar o pedido" width="220" height="220" hidden>
+              <ol class="pay-steps">
+                <li>Abra o app do seu banco e escolha pagar com Pix.</li>
+                <li>Escaneie o QR Code ou use o Pix copia e cola.</li>
+                <li>Confira o valor e confirme. A confirmação aparece aqui.</li>
+              </ol>
+              <label class="pix-label" for="pix-code">Pix copia e cola</label>
+              <input class="pix-code" id="pix-code" type="text" readonly>
+              <button type="button" class="btn btn-secondary pix-copy" id="pix-copy">COPIAR CÓDIGO PIX</button>
+              <p class="pay-feedback" id="pix-copy-msg" role="status" aria-live="polite"></p>
+              <a class="link-btn" id="pix-link" href="#" target="_blank" rel="noopener" hidden>Abrir link de pagamento</a>
+            </div>
+
+            <div class="pay-done" id="pay-done" hidden>
+              <dl class="pay-done-list">
+                <div><dt>Valor pago</dt><dd id="pd-total"></dd></div>
+                <div><dt>Pedido</dt><dd id="pd-order"></dd></div>
+                <div><dt>Endereço</dt><dd id="pd-address"></dd></div>
+                <div><dt>ID da cobrança</dt><dd id="pd-id"></dd></div>
+              </dl>
+              <p class="pay-next" id="pd-next"></p>
+              <button type="button" class="btn btn-secondary" id="pix-new">FAZER NOVO PEDIDO</button>
+            </div>
+
+            <div class="pay-actions">
+              <button type="button" class="btn btn-secondary" id="pix-check" hidden>VERIFICAR PAGAMENTO AGORA</button>
+              <button type="button" class="btn btn-primary" id="pix-retry" hidden>GERAR NOVO PIX</button>
+              <button type="button" class="link-btn" id="pix-edit">Alterar pedido</button>
+              <p class="pay-warn">Se alterar o pedido, não pague este Pix: gere um novo.</p>
+              <a class="support-link" id="pix-support" href="https://wa.me/5513976033642" target="_blank" rel="noopener">Precisa de ajuda? Falar com o suporte no WhatsApp</a>
+            </div>
+          </section>
 
           <div class="order-bar">
             <p class="order-bar-total"><span>Total</span> <strong id="bar-total">Informe o CEP</strong></p>
-            <button class="btn btn-primary order-submit" type="submit">CONFIRMAR PEDIDO PELO WHATSAPP</button>
-            <button class="btn btn-secondary order-submit" type="button" id="pix-btn" hidden>PAGAR COM PIX</button>
+            <button class="btn btn-primary order-submit" type="submit" id="pix-btn">GERAR PIX PARA PAGAR</button>
           </div>
+          <p class="support-line">Problemas para pagar? <a id="support-link" href="https://wa.me/5513976033642" target="_blank" rel="noopener">Fale com o suporte no WhatsApp</a></p>
 
-          <noscript><p class="form-error">Para usar o formulário, ative o JavaScript ou <a href="https://wa.me/5513976033642">chame direto no WhatsApp</a>.</p></noscript>
+          <noscript><p class="form-error">Para usar o formulário, ative o JavaScript ou <a href="https://wa.me/5513976033642">fale com o suporte no WhatsApp</a>.</p></noscript>
         </form>
       </div>
     </section>
@@ -195,15 +228,15 @@
         <ol class="steps-list">
           <li class="step">
             <span class="step-number" aria-hidden="true">01</span>
-            <p class="step-text">Chame no WhatsApp</p>
+            <p class="step-text">Informe CEP e quantidade</p>
           </li>
           <li class="step">
             <span class="step-number" aria-hidden="true">02</span>
-            <p class="step-text">Informe seu endereço</p>
+            <p class="step-text">Pague com Pix</p>
           </li>
           <li class="step">
             <span class="step-number" aria-hidden="true">03</span>
-            <p class="step-text">Receba seu gás</p>
+            <p class="step-text">Receba seu gás e entregue o vazio</p>
           </li>
         </ol>
       </div>
@@ -227,7 +260,8 @@
           </li>
         </ul>
         <p class="loyalty-highlight">Comprou 10 gases? O próximo é GRÁTIS.</p>
-        <a class="btn btn-secondary" href="https://wa.me/5513976033642?text=Ol%C3%A1!%20Quero%20saber%20mais%20sobre%20o%20programa%20de%20fidelidade%20da%20Ultragaz%20Entregas%20Flash." target="_blank" rel="noopener">Saber mais pelo WhatsApp</a>
+        <p class="loyalty-note">O vale e o gás grátis não são aplicados automaticamente no pagamento pelo site. Para usá-los, fale com o suporte.</p>
+        <a class="btn btn-secondary" href="https://wa.me/5513976033642?text=Ol%C3%A1!%20Quero%20saber%20mais%20sobre%20o%20programa%20de%20fidelidade%20da%20Ultragaz%20Entregas%20Flash." target="_blank" rel="noopener">Falar com o suporte no WhatsApp</a>
       </div>
     </section>
 
@@ -249,7 +283,7 @@
             <p class="area-price">R$ 120 com entrega</p>
           </li>
         </ul>
-        <a class="btn btn-secondary" href="https://wa.me/5513976033642" target="_blank" rel="noopener">Consultar pelo WhatsApp</a>
+        <a class="btn btn-secondary" href="#pedido">Comprar gás</a>
       </div>
     </section>
 
@@ -260,6 +294,7 @@
           <h2 id="products-title">Além do gás</h2>
           <p class="products-kicker">Uma solução completa para sua casa ou negócio</p>
           <p class="products-text">Além da entrega de gás, também oferecemos produtos e equipamentos para quem precisa de praticidade no dia a dia.</p>
+          <p class="products-note">Estes itens ainda não podem ser pagos no site: o pedido é combinado pelo WhatsApp.</p>
         </div>
         <div class="products-grid">
           <article class="product product-featured" aria-labelledby="p6-title">
@@ -370,8 +405,8 @@
     <section class="final-cta" aria-labelledby="final-cta-title">
       <div class="container final-cta-inner">
         <h2 id="final-cta-title">Precisando de gás?</h2>
-        <p class="final-cta-text">Peça agora pelo WhatsApp.</p>
-        <a class="btn btn-primary" href="https://wa.me/5513976033642" target="_blank" rel="noopener">PEDIR MEU GÁS</a>
+        <p class="final-cta-text">Compre pelo site e pague com Pix.</p>
+        <a class="btn btn-primary" href="#pedido">COMPRAR GÁS</a>
       </div>
     </section>
 
@@ -388,15 +423,15 @@
         11349-330
       </address>
       <p class="footer-whatsapp">
-        WhatsApp:
+        Suporte no WhatsApp:
         <a href="https://wa.me/5513976033642" target="_blank" rel="noopener" aria-label="Chamar no WhatsApp (13) 97603-3642">(13) 97603-3642</a>
       </p>
     </div>
   </footer>
 
-  <a class="whats-float" href="https://wa.me/5513976033642" target="_blank" rel="noopener" aria-label="Pedir gás pelo WhatsApp">
+  <a class="whats-float" href="https://wa.me/5513976033642" target="_blank" rel="noopener" aria-label="Falar com o suporte pelo WhatsApp">
     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.600l2.200-2.200c.3-.3.700-.4 1-.2 1.100.4 2.300.6 3.600.6.600 0 1 .4 1 1V20c0 .6-.4 1-1 1C9.600 21 2 13.400 2 4c0-.6.4-1 1-1h3.500c.6 0 1 .4 1 1 0 1.300.2 2.500.6 3.600.1.300 0 .7-.3 1l-2.200 2.200z"/></svg>
-    <span>WhatsApp</span>
+    <span>Suporte</span>
   </a>
 
   <script src="script.js" defer></script>
