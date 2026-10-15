@@ -7,6 +7,11 @@
   const PRICE = { regular: 110, pg: 120 };
   const MAX_QTY = 99;    // limite técnico do seletor
 
+  // Pix (Magnus Pay): cole aqui a URL REAL da pasta /api do projeto na Vercel, sem barra no final.
+  // Ex.: 'https://nome-do-projeto.vercel.app/api'. Vazio = botão Pix escondido (site funciona como antes).
+  const PIX_API_BASE = 'https://ultragaz-virid.vercel.app/api';
+  const PIX_MAX_GAS = 20; // acima disso o pedido é combinado pelo WhatsApp (o servidor aplica o mesmo limite)
+
   const $ = (id) => document.getElementById(id);
   const form = $('order-form');
   if (!form) return;
@@ -263,6 +268,148 @@
     new IntersectionObserver(([entry]) => {
       document.body.classList.toggle('in-order', entry.isIntersecting);
     }, { threshold: 0.05 }).observe(section);
+  }
+
+
+  /* ---------- Pagamento por Pix (Magnus Pay) ----------
+     O navegador só envia produto, quantidade e dados de entrega. Preço e cidade são decididos
+     no servidor. "Pago" só aparece quando o servidor confirma COMPLETED na Magnus Pay. */
+  const pix = {
+    btn: $('pix-btn'), panel: $('pix-panel'), status: $('pix-status'), total: $('pix-total'),
+    qr: $('pix-qr'), code: $('pix-code'), copy: $('pix-copy'), link: $('pix-link'), wa: $('pix-wa'),
+  };
+  if (PIX_API_BASE && pix.btn && pix.panel) {
+    let busy = false;
+    let timer = null;
+    let charge = null; // { id, sig, expiresAt, paid }
+
+    pix.btn.hidden = false;
+
+    const orderSig = () => [state.qty, digits(f.cep.value), f.number.value.trim(), f.complement.value.trim(), f.name.value.trim()].join('|');
+    const setStatus = (text, kind) => { pix.status.textContent = text; pix.status.className = 'pix-status' + (kind ? ' is-' + kind : ''); };
+    const stopPolling = () => { if (timer) { clearTimeout(timer); timer = null; } };
+    const showError = (msg) => { ui.formError.textContent = msg; ui.formError.hidden = false; };
+    const api = (path, body) => fetch(PIX_API_BASE + path, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+
+    function whatsappLink() {
+      const lines = buildMessage().split('\n');
+      lines.pop(); // troca "Quero confirmar meu pedido." pelos dados do Pix
+      lines.push('Pagamento: Pix ' + (charge.paid ? 'confirmado' : 'gerado (aguardando confirmação)'), 'ID da cobrança: ' + charge.id);
+      return 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(lines.join('\n'));
+    }
+
+    function resetPix() {
+      stopPolling();
+      charge = null;
+      pix.panel.hidden = true;
+      pix.btn.textContent = 'PAGAR COM PIX';
+    }
+
+    function poll(id) {
+      stopPolling();
+      const started = Date.now();
+      let polls = 0;
+      const tick = async () => {
+        if (!charge || charge.id !== id) return;
+        if (++polls > 150) { // limite de tentativas (~15 min); não presume pagamento
+          setStatus('Não conseguimos confirmar o pagamento automaticamente. Se você já pagou, envie o pedido pelo WhatsApp com o ID da cobrança.', 'info');
+          return;
+        }
+        if (Date.now() > charge.expiresAt + 30000) {
+          setStatus('Este Pix expirou. Toque em "Gerar novo Pix" para pagar.', 'error');
+          pix.btn.textContent = 'GERAR NOVO PIX';
+          charge = null;
+          return;
+        }
+        let next = Date.now() - started > 120000 ? 10000 : 6000;
+        try {
+          const res = await api('/payment-status', { transactionId: id });
+          const data = res.ok ? await res.json() : null;
+          if (!charge || charge.id !== id) return;
+          if (data && data.status === 'COMPLETED') {
+            charge.paid = true;
+            setStatus('Pagamento confirmado! Envie o pedido pelo WhatsApp para agendarmos a entrega.', 'ok');
+            pix.wa.href = whatsappLink();
+            pix.btn.textContent = 'PIX PAGO';
+            pix.btn.disabled = true;
+            return;
+          }
+          if (data && (data.status === 'EXPIRED' || data.status === 'FAILED')) {
+            setStatus(data.status === 'EXPIRED' ? 'Este Pix expirou. Toque em "Gerar novo Pix".' : 'O pagamento não foi concluído. Toque em "Gerar novo Pix".', 'error');
+            pix.btn.textContent = 'GERAR NOVO PIX';
+            charge = null;
+            return;
+          }
+        } catch (_) { next = 10000; }
+        timer = setTimeout(tick, next);
+      };
+      timer = setTimeout(tick, 6000);
+    }
+
+    function showCharge(data) {
+      pix.total.textContent = money(data.total);
+      pix.code.value = data.copyPaste;
+      if (data.qrCodeBase64) { pix.qr.src = data.qrCodeBase64; pix.qr.hidden = false; } else { pix.qr.hidden = true; pix.qr.removeAttribute('src'); }
+      if (data.paymentLink) { pix.link.href = data.paymentLink; pix.link.hidden = false; } else { pix.link.hidden = true; }
+      pix.wa.href = whatsappLink();
+      pix.wa.hidden = false;
+      setStatus('Aguardando pagamento. Pague no app do seu banco; a confirmação aparece aqui automaticamente.', 'info');
+      pix.panel.hidden = false;
+      pix.panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function startPix() {
+      if (busy) return;
+      const invalid = validate();
+      if (invalid) { showError('Confira os campos destacados para continuar.'); invalid.focus(); return; }
+      if (state.qty > PIX_MAX_GAS) { showError('Para mais de ' + PIX_MAX_GAS + ' gases, peça pelo WhatsApp.'); return; }
+      ui.formError.hidden = true;
+
+      const sig = orderSig();
+      if (charge && charge.sig === sig && Date.now() < charge.expiresAt) { pix.panel.hidden = false; pix.panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return; }
+
+      busy = true;
+      pix.btn.disabled = true;
+      pix.btn.textContent = 'GERANDO PIX…';
+      try {
+        const res = await api('/create-payment', {
+          productId: 'gas', qty: state.qty, cep: digits(f.cep.value),
+          name: f.name.value.trim(), number: f.number.value.trim(), complement: f.complement.value.trim(),
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data || !data.ok) {
+          const e = new Error('api'); e.userMessage = data && data.error; throw e;
+        }
+        stopPolling();
+        charge = { id: data.transactionId, sig, expiresAt: Date.now() + (data.expiresInSeconds || 900) * 1000, paid: false };
+        showCharge(data);
+        poll(charge.id);
+        pix.btn.textContent = 'VER PIX GERADO';
+      } catch (err) {
+        showError((err && err.userMessage) || 'Não foi possível gerar o Pix agora. Tente novamente ou confirme pelo WhatsApp.');
+        pix.btn.textContent = charge ? 'VER PIX GERADO' : 'PAGAR COM PIX';
+      } finally {
+        busy = false;
+        if (!(charge && charge.paid)) pix.btn.disabled = false;
+      }
+    }
+
+    window.addEventListener('pagehide', stopPolling);
+    pix.btn.addEventListener('click', startPix);
+    pix.copy.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(pix.code.value); }
+      catch (_) { pix.code.select(); document.execCommand('copy'); }
+      pix.copy.textContent = 'CÓDIGO COPIADO ✓';
+      setTimeout(() => { pix.copy.textContent = 'COPIAR CÓDIGO PIX'; }, 2000);
+    });
+
+    // Se o pedido mudar depois de gerar o Pix, o painel antigo some (evita pagar um valor desatualizado).
+    const onOrderChange = () => { if (charge && !charge.paid && charge.sig !== orderSig()) { resetPix(); pix.btn.disabled = false; } };
+    form.addEventListener('input', onOrderChange);
+    ui.minus.addEventListener('click', onOrderChange);
+    ui.plus.addEventListener('click', onOrderChange);
   }
 
   render();
