@@ -166,9 +166,21 @@
 
           <p class="form-error" id="form-error" role="alert" hidden></p>
 
+          <div class="pix-panel" id="pix-panel" hidden>
+            <h3 class="pix-title">Pague com Pix <span class="pix-total" id="pix-total"></span></h3>
+            <p class="pix-status" id="pix-status" role="status" aria-live="polite"></p>
+            <img class="pix-qr" id="pix-qr" alt="QR Code Pix para pagar o pedido" width="220" height="220" hidden>
+            <label class="pix-label" for="pix-code">Pix copia e cola</label>
+            <input class="pix-code" id="pix-code" type="text" readonly>
+            <button type="button" class="btn btn-secondary pix-copy" id="pix-copy">COPIAR CÓDIGO PIX</button>
+            <a class="link-btn" id="pix-link" href="#" target="_blank" rel="noopener" hidden>Abrir link de pagamento</a>
+            <a class="btn btn-primary pix-wa" id="pix-wa" href="#" target="_blank" rel="noopener" hidden>ENVIAR PEDIDO PELO WHATSAPP</a>
+          </div>
+
           <div class="order-bar">
             <p class="order-bar-total"><span>Total</span> <strong id="bar-total">Informe o CEP</strong></p>
             <button class="btn btn-primary order-submit" type="submit">CONFIRMAR PEDIDO PELO WHATSAPP</button>
+            <button class="btn btn-secondary order-submit" type="button" id="pix-btn" hidden>PAGAR COM PIX</button>
           </div>
 
           <noscript><p class="form-error">Para usar o formulário, ative o JavaScript ou <a href="https://wa.me/5513976033642">chame direto no WhatsApp</a>.</p></noscript>
