@@ -875,3 +875,16 @@ body { padding-bottom: 4.5rem; }
   .product-featured .carousel { flex: 1.15; min-width: 0; padding: 1.25rem; }
   .product-featured .product-body { flex: 1; padding: 1.75rem 1.75rem 1.75rem .5rem; }
 }
+
+/* ---------- Pagamento por Pix (Magnus Pay) ---------- */
+.pix-panel { display: grid; gap: .6rem; margin-bottom: 1rem; padding: 1rem; background: var(--blue-soft); border: 1px solid var(--line); border-radius: var(--radius); text-align: center; }
+.pix-title { margin: 0; font-size: 1.1rem; color: var(--blue-dark); }
+.pix-total { margin-left: .35rem; font-weight: 900; }
+.pix-status { margin: 0; font-size: .95rem; font-weight: 600; color: var(--muted); }
+.pix-status.is-ok { color: var(--whats); }
+.pix-status.is-error { color: #8c1d18; }
+.pix-qr { justify-self: center; width: 220px; max-width: 100%; height: auto; background: var(--white); border: 1px solid var(--line); border-radius: 10px; }
+.pix-label { font-size: .85rem; font-weight: 700; color: var(--muted); text-align: left; }
+.pix-code { width: 100%; padding: .65rem .75rem; font: inherit; font-size: .85rem; color: var(--text); background: var(--white); border: 1px solid var(--line); border-radius: 10px; text-overflow: ellipsis; }
+.pix-copy, .pix-wa { width: 100%; max-width: none; }
+
